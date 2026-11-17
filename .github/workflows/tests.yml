@@ -26,4 +26,6 @@ jobs:
 
       - name: Run API tests
         working-directory: backend
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
         run: python -m pytest -q
