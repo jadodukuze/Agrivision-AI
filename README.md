@@ -1,46 +1,31 @@
 # AgriVision AI 🌱
 
-**AI-assisted crop disease identification for farmers.**
+**A crop-health support platform for farmers and agricultural experts.**
 
-AgriVision AI is a web application concept that helps farmers submit crop-leaf photos, receive a preliminary AI-assisted disease assessment, and access practical prevention guidance. It is a decision-support tool, not a replacement for an agricultural expert.
+AgriVision AI is being developed to help farmers submit crop-leaf photos, keep a record of crop-health concerns, and receive expert-reviewed information. The long-term goal is to add an evaluated AI image-classification model.
 
-## Project goals
+## Current starter features
+- Responsive farmer-facing website.
+- Crop case form with image preview and browser-side file checks.
+- FastAPI service with health endpoint.
+- Crop photo upload endpoint (JPG, PNG, WebP; maximum 5 MB).
+- Initial MySQL schema for users, crop cases, expert reviews, and AI predictions.
+- Initial API tests and GitHub Actions workflow.
 
-- Make it easier to report and review crop health problems.
-- Provide clear guidance in English and Kinyarwanda.
-- Help agricultural experts review farmer-submitted cases.
-- Keep records of submitted crop images and assessment results.
+**Not implemented yet:** user authentication, persistent MySQL case storage, farmer/expert/admin dashboards, Kinyarwanda translation, and AI model inference. The current upload API stores images on the server filesystem and returns a pending expert-review status. It must not be treated as a disease diagnosis.
 
-## Planned technology
+## Technology
+- Frontend: HTML, CSS, JavaScript
+- Backend: Python, FastAPI
+- Database: MySQL (initial schema in `docs/database_schema.sql`)
+- Planned AI: Python image-classification model, to be trained and evaluated using a suitable licensed dataset
 
-- **Frontend:** HTML, CSS, JavaScript
-- **Backend:** Python, FastAPI
-- **Database:** MySQL
-- **AI:** Python image-classification model (to be integrated and evaluated)
+## User roles planned
+1. Farmer — submit crop photos and view case history.
+2. Agricultural expert — review cases and provide verified guidance.
+3. Administrator — manage accounts, crop information, and platform content.
 
-## Main user roles
-
-1. **Farmer:** submits crop photos and views assessment history.
-2. **Agricultural expert:** reviews cases and provides verified advice.
-3. **Administrator:** manages users, crop information, and platform content.
-
-## Current development status
-
-This repository starts with the project foundation. AI predictions are not yet implemented. Until a model is trained, tested, and connected, the application must not claim to diagnose crop diseases.
-
-## Planned development stages
-
-1. Project structure and documentation.
-2. Responsive frontend.
-3. FastAPI backend and API health check.
-4. MySQL database design and integration.
-5. Image upload with validation and secure storage.
-6. AI model integration and evaluation.
-7. Farmer and expert dashboards.
-8. Testing, deployment, and user documentation.
-
-## Run the backend
-
+## Run the backend locally
 Use Python 3.10 or newer.
 
 ```bash
@@ -48,19 +33,23 @@ cd backend
 python -m venv .venv
 ```
 
-Activate the environment, then install dependencies:
+Activate the virtual environment, then:
 
 ```bash
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-Open the API documentation at `http://127.0.0.1:8000/docs`.
+API documentation: `http://127.0.0.1:8000/docs`.
+Open `frontend/index.html` in a browser for the interface. The form expects the local API at `http://127.0.0.1:8000`.
 
-## Important safety and accuracy note
+## Documentation
+- `docs/PROJECT_PLAN.md` — development phases.
+- `docs/API_AND_DATABASE.md` — API details and current limitations.
+- `docs/database_schema.sql` — initial MySQL schema.
 
-An image-based prediction can be wrong because of lighting, image quality, crop variety, or similar-looking symptoms. Users should treat results as preliminary and consult a qualified agricultural expert before taking important crop-treatment decisions. The project will not recommend pesticide use without verified, crop-specific guidance.
+## Responsible use and privacy
+An image-based model can be wrong because of lighting, image quality, crop variety, and similar-looking symptoms. Any future prediction must be labelled preliminary and reviewed by a qualified agricultural expert. Do not automatically prescribe pesticides or treatment rates. Do not commit passwords, API keys, database credentials, private farmer data, or real uploaded crop photos. Configure private persistent image storage and restrict CORS before deployment.
 
-## Contribution
-
-Work in small, tested steps. Never commit passwords, API keys, database credentials, private farmer data, or real uploaded crop images.
+## Development approach
+Build and test the platform in small phases: authentication and database persistence; farmer, expert, and admin dashboards; reviewed AI integration; English/Kinyarwanda interface; then security, accessibility, and deployment.
