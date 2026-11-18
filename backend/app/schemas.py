@@ -46,3 +46,10 @@ class CaseResponse(BaseModel):
     status: str
     created_at: datetime
     has_image: bool = True
+
+
+class StaffCreateRequest(BaseModel):
+    full_name: str = Field(min_length=2, max_length=120)
+    email: EmailStr
+    password: str = Field(min_length=12, max_length=128)
+    role: str = Field(pattern="^(expert|admin)$")
