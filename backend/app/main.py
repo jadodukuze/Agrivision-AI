@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from uuid import uuid4
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from PIL import Image, UnidentifiedImageError
@@ -274,3 +275,21 @@ def admin_summary(admin: User = Depends(require_roles("admin")), db: Session = D
         "cases": count(select(func.count()).select_from(CropCase)),
         "pending_cases": count(select(func.count()).select_from(CropCase).where(CropCase.status.in_(["submitted", "under_review"]))),
     }
+
+
+@app.get("/api/v1/cases/{case_id}/image", tags=["Crop cases"])
+def get_case_image(case_id: str, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Return a case photo only to its owner or an authorised expert/admin."""
+    case = db.get(CropCase, case_id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Crop case not found")
+    if user.role == "farmer" and case.farmer_id != user.id:
+        raise HTTPException(status_code=404, detail="Crop case not found")
+    image_path = Path(case.image_path).resolve()
+    if not image_path.is_file():
+        raise HTTPException(status_code=404, detail="Crop image is unavailable")
+    media_types = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
+    media_type = media_types.get(image_path.suffix.lower())
+    if not media_type:
+        raise HTTPException(status_code=415, detail="Unsupported stored image type")
+    return FileResponse(image_path, media_type=media_type, filename=image_path.name)
