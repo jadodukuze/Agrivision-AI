@@ -1,38 +1,35 @@
-name: AgriVision AI API Tests
+name: AgriVision AI CI
 
 on:
   push:
-    branches: [main, "feature/**"]
+    branches: ["**"]
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.11", "3.12"]
     defaults:
       run:
         working-directory: backend
+    env:
+      PYTHONPATH: ${{ github.workspace }}/backend
+      JWT_SECRET_KEY: test-only-secret-key-not-for-production
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
           cache: pip
           cache-dependency-path: backend/requirements.txt
-
       - name: Install backend dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
-
-      - name: Run API tests
-        env:
-          PYTHONPATH: ${{ github.workspace }}/backend
+      - name: Run tests
         run: python -m pytest -q
