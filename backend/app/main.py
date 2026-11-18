@@ -1,5 +1,7 @@
 """AgriVision AI API: authenticated crop cases and expert review."""
 import os
+from dotenv import load_dotenv
+load_dotenv()
 from contextlib import asynccontextmanager
 from pathlib import Path
 from uuid import uuid4
