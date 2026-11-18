@@ -13,7 +13,7 @@
 - [x] Add automated API tests and CI for Python 3.11 and 3.12.
 
 ## Phase 2: Production readiness
-- [ ] Add versioned database migrations.
+- [x] Add versioned Alembic database migrations and CI migration checks.
 - [ ] Replace local uploads with private persistent object storage.
 - [ ] Add rate limiting, email verification, account recovery, and audit logs.
 - [ ] Add privacy retention/deletion controls, backups, and monitoring.
