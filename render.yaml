@@ -1,0 +1,34 @@
+# Render Blueprint for AgriVision AI staging.
+services:
+  - type: web
+    name: agrivision-ai-api
+    runtime: python
+    plan: free
+    region: frankfurt
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.11"
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agrivision-ai-db
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: ""
+      - key: UPLOAD_DIR
+        value: /tmp/agrivision-ai-uploads
+
+databases:
+  - name: agrivision-ai-db
+    databaseName: agrivision_ai
+    user: agrivision_ai
+    plan: free
+    region: frankfurt
+    postgresMajorVersion: "16"
