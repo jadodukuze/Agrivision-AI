@@ -6,6 +6,7 @@ from typing import Optional
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel, Field
@@ -81,7 +82,7 @@ def require_roles(*roles):
 
 @app.get("/", tags=["General"])
 def root():
-    return {"project": "AgriVision AI", "status": "development", "docs": "/docs", "ai_diagnosis_enabled": False}
+    return FileResponse(BASE_DIR.parent / "frontend" / "index.html")
 
 @app.get("/health", tags=["General"])
 def health():
@@ -194,3 +195,8 @@ def review_case(case_id: int, data: ReviewInput, db: Session = Depends(get_db), 
     case.status = "reviewed"
     db.add(review); db.commit(); db.refresh(case)
     return case_view(case)
+
+
+FRONTEND_DIR = BASE_DIR.parent / "frontend"
+app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="frontend-css")
+app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="frontend-js")

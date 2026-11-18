@@ -66,10 +66,19 @@ def test_health_endpoint(client):
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
-def test_root_discloses_ai_is_not_enabled(client):
+def test_root_serves_frontend(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json()["ai_diagnosis_enabled"] is False
+    assert "text/html" in response.headers["content-type"]
+    assert "AgriVision AI" in response.text
+
+
+def test_frontend_assets_are_served_from_same_origin(client):
+    css = client.get("/css/style.css")
+    javascript = client.get("/js/main.js")
+    assert css.status_code == 200
+    assert javascript.status_code == 200
+    assert "window.location.origin" in javascript.text
 
 def test_register_login_and_profile(client):
     token = register_and_login(client)

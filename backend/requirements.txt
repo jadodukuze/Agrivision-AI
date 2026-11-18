@@ -6,6 +6,7 @@ python-dotenv
 Pillow
 SQLAlchemy>=2.0,<3.0
 PyMySQL
+psycopg[binary]>=3.1,<4.0
 PyJWT
 pwdlib[argon2]
 pytest

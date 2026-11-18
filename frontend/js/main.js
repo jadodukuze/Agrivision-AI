@@ -1,4 +1,5 @@
-const API_BASE = document.getElementById("caseForm")?.dataset.apiBase || "http://127.0.0.1:8000";
+// The frontend and API share one origin in the Render deployment.
+const API_BASE = document.getElementById("caseForm")?.dataset.apiBase || window.location.origin;
 const TOKEN_KEY = "agrivision_access_token";
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
