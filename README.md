@@ -33,6 +33,10 @@ AgriVision AI helps farmers submit crop photos, track crop-health cases, and rec
 - Image validation: Pillow
 - CI: GitHub Actions and pytest
 
+## Deploy to Render
+
+A Render Blueprint is provided in `render.yaml` for a staging deployment. Follow [`docs/RENDER_DEPLOYMENT.md`](docs/RENDER_DEPLOYMENT.md) to connect GitHub and deploy. The free configuration is for testing only: its database expires after 30 days, the web service has no persistent disk, and uploaded photos are temporary. Do not use it for real farmer data. Durable database backups and private persistent image storage are required before production.
+
 ## Local setup
 
 Use Python 3.10 or newer. From the repository root:
