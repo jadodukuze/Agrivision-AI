@@ -10,7 +10,9 @@ from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
-from app.database import Base, SessionLocal, engine
+from sqlalchemy import inspect
+
+from app.database import SessionLocal, engine
 from app.models import User
 from app.security import hash_password
 
@@ -22,7 +24,8 @@ def main() -> None:
     if not full_name or not email or len(password) < 12:
         raise SystemExit("Set ADMIN_FULL_NAME, ADMIN_EMAIL, and an ADMIN_PASSWORD of at least 12 characters in backend/.env.")
 
-    Base.metadata.create_all(bind=engine)
+    if not inspect(engine).has_table('users'):
+        raise SystemExit("Database tables are missing. Run 'python -m alembic upgrade head' first.")
     db = SessionLocal()
     try:
         existing = db.query(User).filter(User.email == email).first()
