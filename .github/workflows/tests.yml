@@ -34,5 +34,5 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}/backend
           DATABASE_URL: sqlite:///./agrivision_ci.db
-          JWT_SECRET_KEY: test-only-secret-key-for-ci
+          JWT_SECRET_KEY: test-only-secret-key-for-ci-which-is-long-enough-32-bytes
         run: python -m pytest -q
