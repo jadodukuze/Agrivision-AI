@@ -2,34 +2,44 @@
 
 **A crop-health support platform for farmers and agricultural experts.**
 
-AgriVision AI is being developed to help farmers submit crop-leaf photos, keep a record of crop-health concerns, and receive expert-reviewed information. The long-term goal is to add an evaluated AI image-classification model.
+AgriVision AI helps farmers create accounts, submit crop-health photos, track their cases, and receive human expert review. The project is designed to add a properly evaluated AI image-classification model in a later phase.
 
-## Current starter features
+## Implemented in this version
+
 - Responsive farmer-facing website.
-- Crop case form with image preview and browser-side file checks.
-- FastAPI service with health endpoint.
-- Crop photo upload endpoint (JPG, PNG, WebP; maximum 5 MB).
-- Initial MySQL schema for users, crop cases, expert reviews, and AI predictions.
-- Initial API tests and GitHub Actions workflow.
+- Farmer registration and sign-in.
+- Password hashing with Argon2 and signed JWT authentication.
+- Role-aware API access for farmers, experts, and administrators.
+- Crop case submission with JPG, PNG, and WebP validation (maximum 5 MB).
+- Persistent case metadata through SQLAlchemy.
+- Farmer case history.
+- Expert case queue and review submission endpoints.
+- Basic administrator user listing and account deactivation endpoints.
+- API documentation at `/docs`.
+- Automated API tests with GitHub Actions.
 
-**Not implemented yet:** user authentication, persistent MySQL case storage, farmer/expert/admin dashboards, Kinyarwanda translation, and AI model inference. The current upload API stores images on the server filesystem and returns a pending expert-review status. It must not be treated as a disease diagnosis.
+## Not implemented yet
+
+- **AI disease classification:** no trained or evaluated model is included yet. The application must not be used as an automated diagnosis tool.
+- Full expert and administrator web dashboards.
+- Kinyarwanda translations.
+- Production image object storage and secure image viewing.
+- Database migrations, deployment automation, monitoring, and backups.
 
 ## Technology
+
 - Frontend: HTML, CSS, JavaScript
 - Backend: Python, FastAPI
-- Database: MySQL (initial schema in `docs/database_schema.sql`)
-- Planned AI: Python image-classification model, to be trained and evaluated using a suitable licensed dataset
+- Database: SQLAlchemy; SQLite for development/tests and MySQL for deployment
+- Authentication: Argon2 password hashing and JWT
+- Image validation: Pillow
+- Planned AI: evaluated Python image-classification model using a suitable licensed dataset
 
-## User roles planned
-1. Farmer — submit crop photos and view case history.
-2. Agricultural expert — review cases and provide verified guidance.
-3. Administrator — manage accounts, crop information, and platform content.
+## Run the backend
 
-## Run the backend locally
-Use Python 3.10 or newer.
+Use Python 3.10 or newer. From the `backend` directory:
 
 ```bash
-cd backend
 python -m venv .venv
 ```
 
@@ -37,19 +47,50 @@ Activate the virtual environment, then:
 
 ```bash
 pip install -r requirements.txt
+```
+
+Copy `.env.example` to `.env`, set a private `JWT_SECRET_KEY`, then run:
+
+```bash
 uvicorn app.main:app --reload
 ```
 
 API documentation: `http://127.0.0.1:8000/docs`.
-Open `frontend/index.html` in a browser for the interface. The form expects the local API at `http://127.0.0.1:8000`.
 
-## Documentation
-- `docs/PROJECT_PLAN.md` — development phases.
-- `docs/API_AND_DATABASE.md` — API details and current limitations.
-- `docs/database_schema.sql` — initial MySQL schema.
+SQLite is used by default. To use MySQL, create the `agrivision_ai` database and set `DATABASE_URL` in the environment:
 
-## Responsible use and privacy
-An image-based model can be wrong because of lighting, image quality, crop variety, and similar-looking symptoms. Any future prediction must be labelled preliminary and reviewed by a qualified agricultural expert. Do not automatically prescribe pesticides or treatment rates. Do not commit passwords, API keys, database credentials, private farmer data, or real uploaded crop photos. Configure private persistent image storage and restrict CORS before deployment.
+```text
+mysql+pymysql://USER:PASSWORD@HOST:3306/agrivision_ai?charset=utf8mb4
+```
 
-## Development approach
-Build and test the platform in small phases: authentication and database persistence; farmer, expert, and admin dashboards; reviewed AI integration; English/Kinyarwanda interface; then security, accessibility, and deployment.
+Never commit `.env`, passwords, JWT secrets, or real farmer data.
+
+## Run the frontend
+
+In a second terminal, from the `frontend` directory:
+
+```bash
+python -m http.server 5500
+```
+
+Open `http://127.0.0.1:5500`. The frontend expects the API at `http://127.0.0.1:8000`. Configure `CORS_ORIGINS` if the frontend uses another origin.
+
+## Roles
+
+1. **Farmer:** register, sign in, submit crop cases, and view personal case history.
+2. **Expert:** review submitted cases and save assessments through the protected expert API.
+3. **Administrator:** manage user accounts through the protected administration API.
+
+Public registration always creates a farmer. It cannot create an expert or administrator. To bootstrap the first administrator, set `ADMIN_EMAIL` and `ADMIN_PASSWORD` as private environment secrets before starting the API. Expert accounts must be provisioned by a trusted administrator/database operator. Never expose these credentials in GitHub source files.
+
+## API documentation
+
+See [docs/API_AND_DATABASE.md](docs/API_AND_DATABASE.md) for routes, roles, database configuration, and limitations.
+
+## Responsible use, safety, and privacy
+
+Crop symptoms can look similar, and image quality, lighting, and crop variety affect model performance. The current version does not run AI diagnosis. Expert guidance must be reviewed by qualified agricultural professionals. Do not automatically prescribe pesticide products or application rates. Protect farmer photos and personal information; use private persistent storage, access controls, HTTPS, backups, and a clear retention policy before production.
+
+## Development plan
+
+See [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md). The next phases are expert/admin web dashboards, secure image delivery, Kinyarwanda support, evaluated AI integration, and production deployment hardening.
