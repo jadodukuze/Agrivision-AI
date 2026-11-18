@@ -1,37 +1,35 @@
-# AgriVision AI API and database notes
+# AgriVision AI API and database
 
-## Current API
+## Implemented API
+- `GET /` — service information and explicit AI availability flag.
+- `GET /health` — health check.
+- `POST /api/v1/auth/register` — create a farmer account. Public registration cannot assign privileged roles.
+- `POST /api/v1/auth/login` — issue a short-lived JWT access token.
+- `GET /api/v1/auth/me` — current authenticated user.
+- `POST /api/v1/cases` — authenticated farmer submits a crop photo.
+- `GET /api/v1/cases/mine` — farmer sees their own cases and expert reviews.
+- `GET /api/v1/expert/cases` — expert/admin case queue.
+- `POST /api/v1/expert/cases/{case_id}/review` — expert/admin records a review.
+- `POST /api/v1/admin/users` — admin creates expert/admin accounts.
+- `GET /api/v1/admin/summary` — admin dashboard counts.
 
-- `GET /`: project status and documentation path.
-- `GET /health`: service health check.
-- `POST /api/v1/cases`: accepts `farmer_name`, `crop_name`, optional `location` and `description`, and an image file (JPG/PNG/WebP, maximum 5 MB).
+## Data and configuration
+SQLAlchemy supports SQLite for development and MySQL through PyMySQL. Set `DATABASE_URL` in a private `.env` file. The example MySQL URL is in `.env.example`. Tables are created at application startup for this starter release; production deployments should use versioned migrations.
 
-The upload endpoint checks the actual image bytes and format, rejects invalid files, limits image dimensions, and saves accepted images under `backend/storage/uploads` using a generated UUID filename.
+Set a long random `JWT_SECRET_KEY`. Never use the CI test key in a deployed environment. Restrict `CORS_ORIGINS` to the real frontend origins. Keep uploads in private persistent storage and configure backups before production.
 
-Example form fields:
+## Image safety
+Uploads are limited to 5 MB, allow-listed by MIME type, verified against actual image format, and bounded by a pixel limit. Uploaded photos are not exposed through a public static URL.
 
-- `farmer_name` (required, 2–100 characters)
-- `crop_name` (required, 2–80 characters)
-- `location` (optional, up to 120 characters)
-- `description` (optional, up to 1,000 characters)
-- `image` (required; JPG, PNG, or WebP; up to 5 MB)
+## First administrator
+Public registration always creates a farmer. Create the first administrator through a controlled database bootstrap process before using the admin-only staff creation endpoint. Do not add a public admin-registration route.
 
-## Current limitations
+## Responsible AI
+Automated disease classification is not implemented. Every new case remains pending expert review. Any future model must be evaluated on a properly licensed, representative dataset and its limitations documented. Model output must remain preliminary and must not automatically prescribe pesticide products or application rates.
 
-The current upload endpoint stores the image on the server filesystem only. It does not yet persist case metadata to MySQL, authenticate users, or run an AI model. It is suitable only for local development and controlled demonstrations. Do not expose it as a public production service.
-
-Before production, implement authenticated ownership checks, database transactions, private persistent image storage, upload rate limiting, retention/deletion controls, audit logs, and strict CORS origins.
-
-## MySQL
-
-Run `database_schema.sql` in MySQL to create the initial users, crop_cases, expert_reviews, and ai_predictions tables. Database connection code and authenticated case persistence are still pending.
-
-## Run API locally
-
-1. Install dependencies from `backend/requirements.txt`.
-2. Start from the `backend` directory with `uvicorn app.main:app --reload`.
-3. Visit `http://127.0.0.1:8000/docs`.
-
-## CORS
-
-The local frontend server runs at `http://127.0.0.1:5500`. To use another origin, set `AGRI_ALLOWED_ORIGINS` to a comma-separated list of exact origins before starting the API.
+## Local development
+1. Copy `.env.example` to `.env` and set a unique secret.
+2. Install `backend/requirements.txt`.
+3. Run `uvicorn app.main:app --reload` from the `backend` folder.
+4. Open `/docs` on the local API host.
+5. Run tests with `python -m pytest -q` from `backend`.
