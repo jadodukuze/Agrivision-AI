@@ -2,9 +2,12 @@ name: AgriVision AI API Tests
 
 on:
   push:
-    branches: [main]
+    branches: ["main", "feature/**"]
   pull_request:
-    branches: [main]
+    branches: ["main"]
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -17,6 +20,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
 
       - name: Install backend dependencies
         working-directory: backend
@@ -28,4 +33,6 @@ jobs:
         working-directory: backend
         env:
           PYTHONPATH: ${{ github.workspace }}/backend
+          DATABASE_URL: sqlite:///./agrivision_ci.db
+          JWT_SECRET_KEY: test-only-secret-key-for-ci
         run: python -m pytest -q
