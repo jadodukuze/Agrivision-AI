@@ -120,6 +120,7 @@ async def create_case(
     return {
         "case_id": case_id,
         "status": "pending_expert_review",
+        "diagnosis_enabled": False,
         "message": (
             "Photo received. Automated diagnosis is not enabled. "
             "An agricultural expert should review this case."
