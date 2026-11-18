@@ -35,7 +35,7 @@ Uploads are limited to 5 MB, checked against their actual image format, and boun
 
 - Automated crop-disease classification is not implemented.
 - The app currently stores uploaded images on the local filesystem; production should use private persistent storage.
-- Production migrations, rate limiting, email verification, account recovery, audit logging, retention/deletion controls, HTTPS, backups, and monitoring remain to be implemented.
+- Rate limiting, email verification, account recovery, audit logging, retention/deletion controls, HTTPS, backups, and monitoring remain to be implemented.
 - The SQL reference schema mirrors the current SQLAlchemy user, case, and review models. AI prediction tables should be added with the future model integration.
 
 ## Responsible AI
@@ -46,7 +46,7 @@ Every new case remains pending expert review. Any future model must be evaluated
 
 1. Copy `.env.example` to `.env` and set unique secrets.
 2. Install `backend/requirements.txt`.
-3. Run `python create_admin.py` once to provision the first administrator.
-4. Start `uvicorn app.main:app --reload` from the `backend` folder.
-5. Start the frontend with `python -m http.server 5500 --directory frontend` from the repository root.
-6. Run tests with `python -m pytest -q` from `backend`.
+3. Run `python -m alembic upgrade head` to create the database tables.\n4. Run `python create_admin.py` once to provision the first administrator.
+5. Start `uvicorn app.main:app --reload` from the `backend` folder.
+6. Start the frontend with `python -m http.server 5500 --directory frontend` from the repository root.
+7. Run tests with `python -m pytest -q` from `backend`.
