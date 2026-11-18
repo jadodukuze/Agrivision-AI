@@ -1,4 +1,5 @@
 import os
+import hmac
 from pathlib import Path
 from uuid import uuid4
 from typing import Optional
@@ -49,6 +50,10 @@ class StaffInput(BaseModel):
     email: str = Field(min_length=5, max_length=190)
     password: str = Field(min_length=10, max_length=128)
     role: str = Field(pattern="^(expert|admin)$")
+
+class BootstrapAdminInput(BaseModel):
+    email: str = Field(min_length=5, max_length=190)
+    setup_token: str = Field(min_length=32, max_length=256)
 
 class ReviewInput(BaseModel):
     assessment: str = Field(min_length=5, max_length=5000)
@@ -109,6 +114,29 @@ def login(data: LoginInput, db: Session = Depends(get_db)):
 @app.get("/api/v1/auth/me", tags=["Authentication"])
 def me(user: User = Depends(get_current_user)):
     return user_view(user)
+
+@app.post("/api/v1/admin/bootstrap", tags=["Administration"])
+def bootstrap_first_admin(data: BootstrapAdminInput, db: Session = Depends(get_db)):
+    """Promote the one configured account only once, using a private Render secret."""
+    configured_email = os.getenv("ADMIN_BOOTSTRAP_EMAIL", "").strip().lower()
+    configured_token = os.getenv("ADMIN_BOOTSTRAP_TOKEN", "")
+    if not configured_email or len(configured_token) < 32:
+        raise HTTPException(status_code=503, detail="First-admin setup is not enabled.")
+    if not hmac.compare_digest(data.setup_token, configured_token):
+        raise HTTPException(status_code=403, detail="Invalid setup credentials.")
+    if not hmac.compare_digest(data.email.strip().lower(), configured_email):
+        raise HTTPException(status_code=403, detail="This account is not authorized for first-admin setup.")
+
+    # Lock the designated account so simultaneous setup requests cannot both pass.
+    user = db.query(User).filter(User.email == configured_email).with_for_update().first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="The configured account must register before setup.")
+    if db.query(User).filter(User.role == "admin").first() is not None:
+        raise HTTPException(status_code=409, detail="An administrator is already configured.")
+    user.role = "admin"
+    db.commit()
+    db.refresh(user)
+    return {"message": "First administrator configured. Remove ADMIN_BOOTSTRAP_TOKEN from Render now, then sign in again.", "user": user_view(user)}
 
 @app.post("/api/v1/admin/users", status_code=201, tags=["Administration"])
 def create_staff(data: StaffInput, db: Session = Depends(get_db), admin: User = Depends(require_roles("admin"))):
