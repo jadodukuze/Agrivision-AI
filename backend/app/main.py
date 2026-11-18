@@ -5,6 +5,7 @@ from typing import Optional
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel, Field
@@ -155,6 +156,33 @@ def expert_cases(db: Session = Depends(get_db), expert: User = Depends(require_r
     cases = db.query(CropCase).order_by(CropCase.created_at.desc()).all()
     return [case_view(case) for case in cases]
 
+@app.get("/api/v1/expert/cases/{case_id}/image", tags=["Expert review"])
+def expert_case_image(
+    case_id: int,
+    db: Session = Depends(get_db),
+    expert: User = Depends(require_roles("expert", "admin")),
+):
+    """Return a submitted image only to authenticated expert or admin accounts."""
+    case = db.query(CropCase).filter(CropCase.id == case_id).first()
+    if case is None:
+        raise HTTPException(status_code=404, detail="Crop case not found.")
+
+    stored_name = case.image_path
+    if not stored_name or Path(stored_name).name != stored_name:
+        raise HTTPException(status_code=404, detail="Crop image not found.")
+
+    upload_root = UPLOAD_DIR.resolve()
+    image_path = (upload_root / stored_name).resolve()
+    if image_path.parent != upload_root or not image_path.is_file():
+        raise HTTPException(status_code=404, detail="Crop image not found.")
+
+    media_type = {
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".webp": "image/webp",
+    }.get(image_path.suffix.lower(), "application/octet-stream")
+    return FileResponse(image_path, media_type=media_type, filename=image_path.name)
 @app.post("/api/v1/expert/cases/{case_id}/review", tags=["Expert review"])
 def review_case(case_id: int, data: ReviewInput, db: Session = Depends(get_db), expert: User = Depends(require_roles("expert", "admin"))):
     case = db.query(CropCase).filter(CropCase.id == case_id).first()
