@@ -99,3 +99,19 @@ def test_crop_case_rejects_fake_image():
             files={"image": ("fake.png", b"not really an image", "image/png")},
         )
         assert response.status_code == 415
+
+
+def test_farmer_can_download_own_case_image():
+    with TestClient(app) as client:
+        token = register_and_login(client)
+        headers = {"Authorization": f"Bearer {token}"}
+        created = client.post(
+            "/api/v1/cases",
+            headers=headers,
+            data={"crop_name": "Maize"},
+            files={"image": ("leaf.png", make_png(), "image/png")},
+        )
+        assert created.status_code == 201
+        image_response = client.get(f"/api/v1/cases/{created.json()['id']}/image", headers=headers)
+        assert image_response.status_code == 200
+        assert image_response.headers["content-type"] == "image/png"
