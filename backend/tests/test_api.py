@@ -138,3 +138,52 @@ def test_expert_can_access_uploaded_image_and_review_case(client, monkeypatch, t
     assert reviewed.status_code == 200
     assert reviewed.json()["status"] == "reviewed"
     assert len(reviewed.json()['reviews']) == 1
+
+def test_admin_can_create_staff_and_view_summary(client):
+    import uuid
+    db = TestingSessionLocal()
+    try:
+        admin = User(
+            full_name="Test Administrator",
+            email=f"admin-{uuid.uuid4().hex[:10]}@example.com",
+            password_hash=hash_password("StrongAdminPass123"),
+            role="admin",
+        )
+        db.add(admin)
+        db.commit()
+        db.refresh(admin)
+        admin_token = create_access_token(admin.id, admin.role)
+    finally:
+        db.close()
+
+    created = client.post(
+        "/api/v1/admin/users",
+        headers=auth(admin_token),
+        json={
+            "full_name": "New Agricultural Expert",
+            "email": f"new-expert-{uuid.uuid4().hex[:10]}@example.com",
+            "password": "StrongExpertPass123",
+            "role": "expert",
+        },
+    )
+    assert created.status_code == 201
+    assert created.json()["role"] == "expert"
+
+    summary = client.get("/api/v1/admin/summary", headers=auth(admin_token))
+    assert summary.status_code == 200
+    assert summary.json()["experts"] >= 1
+
+
+def test_farmer_cannot_create_staff_account(client):
+    farmer_token = register_and_login(client)
+    response = client.post(
+        "/api/v1/admin/users",
+        headers=auth(farmer_token),
+        json={
+            "full_name": "Not An Admin",
+            "email": "not-admin@example.com",
+            "password": "StrongPassword123",
+            "role": "admin",
+        },
+    )
+    assert response.status_code == 403
