@@ -4,42 +4,45 @@
 - [x] Create project documentation.
 - [x] Add initial frontend landing page.
 - [x] Add FastAPI application and health endpoint.
-- [x] Add responsive crop-case form and browser-side image preview.
-- [x] Connect the form to the API.
-- [x] Validate uploaded image contents, file size, and dimensions on the server.
-- [ ] Verify the starter application locally on a Windows computer.
+- [x] Add repeatable API tests and GitHub Actions CI.
+- [ ] Verify the complete application locally and in a deployed environment.
 
 ## Phase 2: Data and API
-- [x] Design initial MySQL tables for users, crop cases, and expert reviews.
-- [ ] Add database configuration through environment variables.
-- [ ] Persist crop-case metadata in MySQL.
-- [ ] Add secure user authentication and role-based access.
-- [ ] Add private, persistent image storage and retention controls.
-- [ ] Add rate limiting and production CORS configuration.
+- [x] Design MySQL tables for users, crop cases, and expert reviews.
+- [x] Add environment-based configuration and SQLAlchemy persistence (SQLite development; MySQL supported).
+- [x] Add farmer registration, password hashing, JWT authentication, and role checks.
+- [x] Add authenticated crop submissions and farmer case history.
+- [x] Add expert case queue and review workflow.
+- [x] Add admin summary and privileged staff-account creation endpoint.
+- [x] Validate uploaded image content, size, format, and dimensions.
+- [ ] Add versioned database migrations and a controlled first-admin bootstrap.
+- [ ] Add private persistent object storage and authenticated image retrieval.
 
-## Phase 3: User workflows
-- [ ] Farmer registration, login, dashboard, and submission history.
-- [ ] Expert dashboard, case assignment, and review workflow.
-- [ ] Administrator dashboard and account management.
+## Phase 3: AI and expert review
+- [ ] Select a suitable, licensed and representative crop image dataset.
+- [ ] Train and evaluate crop-specific image classification models.
+- [ ] Establish independent validation, class-level metrics, and model cards.
+- [ ] Add an opt-in preliminary prediction workflow with uncertainty handling.
+- [ ] Keep expert review and correction as mandatory safeguards for consequential guidance.
+
+## Phase 4: User experience
+- [x] Initial responsive public landing page and photo submission form.
+- [ ] Farmer dashboard connected to registration, login, and case-history APIs.
+- [ ] Expert dashboard connected to case queue and review APIs.
+- [ ] Administrator dashboard connected to management APIs.
 - [ ] English and Kinyarwanda interface support.
-
-## Phase 4: AI and expert review
-- [ ] Select a suitable, licensed crop image dataset with clear provenance.
-- [ ] Train and evaluate a crop image classification model.
-- [ ] Report per-class precision, recall, F1, confusion matrix, and limitations.
-- [ ] Add model versioning and expert correction workflow.
-- [ ] Clearly label model outputs as preliminary and uncertain where appropriate.
+- [ ] Accessibility and low-bandwidth improvements.
 
 ## Phase 5: Quality and release
-- [x] Add initial automated API tests and GitHub Actions.
-- [ ] Expand unit, integration, and security tests.
-- [ ] Review privacy, accessibility, and security.
-- [ ] Test on mobile screens and slower connections.
-- [ ] Prepare deployment and user documentation.
+- [x] Automated API tests and GitHub Actions CI.
+- [ ] Expand tests for permissions, database failures, uploads, and review lifecycle.
+- [ ] Security and privacy review, rate limiting, audit logging, and backup/restore tests.
+- [ ] Production deployment, monitoring, and operational documentation.
+- [ ] Pilot testing with farmers and qualified agricultural experts.
 
 ## Responsible-use requirements
 - Never present an unverified model output as a confirmed diagnosis.
 - Do not prescribe pesticide products or application rates automatically.
-- Make expert review available for uncertain or high-impact cases.
+- Make qualified expert review available for uncertain or high-impact cases.
 - Protect farmer accounts, photos, and personal information.
-- Do not claim model accuracy until it has been measured on a held-out test set.
+- Do not train on farmer-submitted photos without an appropriate consent and data-governance process.
