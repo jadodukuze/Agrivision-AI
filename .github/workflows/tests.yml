@@ -21,7 +21,7 @@ jobs:
         working-directory: backend
     env:
       PYTHONPATH: ${{ github.workspace }}/backend
-      JWT_SECRET_KEY: test-only-secret-key-not-for-production
+      JWT_SECRET_KEY: test-only-secret-key-not-for-production\n      DATABASE_URL: sqlite:///./agrivision_ci.db\n      APP_ENV: production
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
