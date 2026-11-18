@@ -11,9 +11,12 @@
 - `POST /api/v1/cases` — authenticated farmer submits a crop photo and case details.
 - `GET /api/v1/cases/mine` — farmer views their own submissions.
 - `GET /api/v1/cases/{case_id}` — case detail and any expert review, subject to access rules.
+- `GET /api/v1/cases/{case_id}/image` — private image access for the case owner or an authorised expert/admin.
 - `GET /api/v1/expert/cases` — expert/admin case queue.
 - `POST /api/v1/expert/cases/{case_id}/review` — expert/admin saves an assessment.
 - `GET /api/v1/admin/users` — administrator lists accounts.
+- `POST /api/v1/admin/users` — administrator creates expert or administrator accounts.
+- `GET /api/v1/admin/summary` — administrator dashboard counts.
 - `POST /api/v1/admin/users/{user_id}/deactivate` — administrator deactivates an account.
 
 Interactive API documentation is available at `/docs`.
