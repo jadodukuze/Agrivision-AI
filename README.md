@@ -11,7 +11,7 @@ AgriVision AI helps farmers submit crop photos, track crop-health cases, and rec
 - FastAPI backend with health endpoint and interactive API documentation.
 - Password hashing and JWT authentication.
 - Role-based farmer, expert, and administrator permissions.
-- SQLAlchemy persistence with SQLite development support and MySQL through PyMySQL.
+- SQLAlchemy persistence with SQLite development support and MySQL through PyMySQL.\n- Versioned Alembic database migrations and CI migration smoke tests.
 - Image content verification, 5 MB limit, and image-dimension checks.
 - Authenticated expert queue, protected crop-photo access, and expert reviews.
 - Administrator summary and privileged staff-account creation.
@@ -86,11 +86,11 @@ The example configuration uses SQLite for local development. To use MySQL, set `
 mysql+pymysql://USER:PASSWORD@HOST:3306/agrivision_ai?charset=utf8mb4
 ```
 
-The SQL reference schema is in `docs/database_schema.sql`. The application currently creates missing tables at startup; use versioned database migrations before production.
+The SQL reference schema is in `docs/database_schema.sql`. Alembic migrations are stored in `backend/migrations`. In development (`APP_ENV=development`), the API can create missing tables automatically. In production (`APP_ENV=production`), apply `python -m alembic upgrade head` before starting the API.
 
 ## Current limitations and next milestones
 
-- Production deployment, HTTPS, backups, monitoring, and database migrations are not configured.
+- Production deployment, HTTPS, backups, and monitoring are not configured.
 - Local filesystem uploads must be replaced with private persistent object storage before multi-instance deployment.
 - Rate limiting, account recovery, email verification, audit logging, and a full privacy/retention workflow remain to be implemented.
 - English/Kinyarwanda translations and accessibility testing need further work.
