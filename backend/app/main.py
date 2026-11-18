@@ -25,13 +25,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
 origins = [value.strip() for value in os.getenv("CORS_ORIGINS", "http://127.0.0.1:5500,http://localhost:5500").split(",") if value.strip()]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type"],
-)
 
 
 def initialize_database():
@@ -53,6 +46,27 @@ def initialize_database():
                 db.commit()
         finally:
             db.close()
+
+
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    initialize_database()
+    yield
+
+
+app = FastAPI(
+    title="AgriVision AI",
+    description="Crop-health case submission and agricultural expert review. AI diagnosis is not enabled.",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
+)
 
 
 @app.get("/", tags=["General"])
