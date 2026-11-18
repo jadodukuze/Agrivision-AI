@@ -12,7 +12,7 @@ import jwt
 
 from .database import Base, engine, get_db
 from .models import CropCase, ExpertReview, User
-from .schemas import CaseResponse, LoginRequest, RegisterRequest, ReviewRequest, TokenResponse, UserResponse
+from .schemas import CaseResponse, LoginRequest, RegisterRequest, ReviewRequest, TokenResponse, UserResponse, StaffCreateRequest
 from .security import create_access_token, decode_access_token, hash_password, verify_password
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -239,3 +239,29 @@ def deactivate_user(user_id: int, user: User = Depends(require_roles("admin")), 
     target.is_active = False
     db.commit()
     return {"message": "User account deactivated", "user_id": target.id}
+
+
+@app.post("/api/v1/admin/users", response_model=UserResponse, status_code=201, tags=["Administration"])
+def create_staff_account(payload: StaffCreateRequest, admin: User = Depends(require_roles("admin")), db: Session = Depends(get_db)):
+    """Create an expert or administrator account; public registration cannot grant privileged roles."""
+    email = payload.email.lower()
+    if db.scalar(select(User).where(User.email == email)):
+        raise HTTPException(status_code=409, detail="An account with this email already exists")
+    user = User(full_name=payload.full_name.strip(), email=email, password_hash=hash_password(payload.password), role=payload.role)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@app.get("/api/v1/admin/summary", tags=["Administration"])
+def admin_summary(admin: User = Depends(require_roles("admin")), db: Session = Depends(get_db)):
+    from sqlalchemy import func
+    count = lambda statement: db.scalar(statement) or 0
+    return {
+        "users": count(select(func.count()).select_from(User)),
+        "farmers": count(select(func.count()).select_from(User).where(User.role == "farmer")),
+        "experts": count(select(func.count()).select_from(User).where(User.role == "expert")),
+        "cases": count(select(func.count()).select_from(CropCase)),
+        "pending_cases": count(select(func.count()).select_from(CropCase).where(CropCase.status.in_(["submitted", "under_review"]))),
+    }
