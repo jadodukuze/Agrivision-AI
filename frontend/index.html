@@ -68,6 +68,37 @@
           <button class="secondary-button" type="button" id="logoutButton">Sign out</button>
           <h3>Your crop cases</h3>
           <div id="caseHistory" aria-live="polite"></div>
+        <div id="accountPanel" class="panel account-panel" hidden>
+          <div><strong id="welcomeText">Signed in</strong><p class="muted" id="roleText"></p></div>
+          <button class="secondary-button" type="button" id="logoutButton">Sign out</button>
+          <h3>Your crop cases</h3>
+          <div id="caseHistory" aria-live="polite"></div>
+        </div>
+        <div id="roleWorkspace" class="panel role-workspace" hidden>
+          <section id="expertWorkspace" hidden>
+            <h3>Expert review workspace</h3>
+            <p class="muted">Review farmer submissions. Your assessment is recorded as human expert guidance.</p>
+            <div id="expertQueue" class="case-history" aria-live="polite"></div>
+          </section>
+          <section id="adminWorkspace" hidden>
+            <h3>Administrator dashboard</h3>
+            <div id="adminSummary" class="summary-grid"></div>
+            <h4>Create an expert or administrator account</h4>
+            <form id="staffForm" class="staff-form">
+              <div class="form-row">
+                <div class="field"><label for="staffName">Full name</label><input id="staffName" required minlength="2" maxlength="120"></div>
+                <div class="field"><label for="staffEmail">Email</label><input id="staffEmail" type="email" required></div>
+              </div>
+              <div class="form-row">
+                <div class="field"><label for="staffPassword">Temporary password (12+ characters)</label><input id="staffPassword" type="password" minlength="12" required></div>
+                <div class="field"><label for="staffRole">Role</label><select id="staffRole"><option value="expert">Agricultural expert</option><option value="admin">Administrator</option></select></div>
+              </div>
+              <button class="submit-button" type="submit">Create account</button>
+              <p id="staffStatus" class="status" role="status" aria-live="polite"></p>
+            </form>
+            <h4>Registered users</h4>
+            <div id="userList" class="case-history"></div>
+          </section>
         </div>
       </div>
     </section>
