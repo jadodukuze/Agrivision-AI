@@ -115,3 +115,58 @@ def test_farmer_can_download_own_case_image():
         image_response = client.get(f"/api/v1/cases/{created.json()['id']}/image", headers=headers)
         assert image_response.status_code == 200
         assert image_response.headers["content-type"] == "image/png"
+
+
+def create_test_user(role: str):
+    from app.database import SessionLocal
+    from app.models import User
+    from app.security import create_access_token, hash_password
+    import uuid
+    db = SessionLocal()
+    try:
+        email = f"{role}-{uuid.uuid4().hex[:12]}@example.com"
+        user = User(full_name=f"Test {role.title()}", email=email, password_hash=hash_password("SafeTestPassword123"), role=role)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        return create_access_token(str(user.id))
+    finally:
+        db.close()
+
+
+def test_expert_can_review_farmer_case():
+    with TestClient(app) as client:
+        farmer_token = register_and_login(client)
+        created = client.post(
+            "/api/v1/cases",
+            headers={"Authorization": f"Bearer {farmer_token}"},
+            data={"crop_name": "Beans", "description": "Leaves look unusual"},
+            files={"image": ("leaf.png", make_png(), "image/png")},
+        )
+        assert created.status_code == 201
+        expert_token = create_test_user("expert")
+        queue = client.get("/api/v1/expert/cases", headers={"Authorization": f"Bearer {expert_token}"})
+        assert queue.status_code == 200
+        case_id = created.json()["id"]
+        assert any(item["id"] == case_id for item in queue.json())
+        review = client.post(
+            f"/api/v1/expert/cases/{case_id}/review",
+            headers={"Authorization": f"Bearer {expert_token}"},
+            json={"assessment": "The photo needs an in-person field inspection.", "recommended_next_steps": "Contact a local agricultural extension officer."},
+        )
+        assert review.status_code == 201
+        details = client.get(f"/api/v1/cases/{case_id}", headers={"Authorization": f"Bearer {farmer_token}"})
+        assert details.status_code == 200
+        assert details.json()["reviews"][0]["assessment"].startswith("The photo")
+
+
+def test_admin_can_create_expert_account():
+    with TestClient(app) as client:
+        admin_token = create_test_user("admin")
+        response = client.post(
+            "/api/v1/admin/users",
+            headers={"Authorization": f"Bearer {admin_token}"},
+            json={"full_name": "Agricultural Expert", "email": f"expert-{__import__('uuid').uuid4().hex[:8]}@example.com", "password": "ExpertAccountPass123", "role": "expert"},
+        )
+        assert response.status_code == 201
+        assert response.json()["role"] == "expert"
