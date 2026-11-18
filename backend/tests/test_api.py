@@ -62,7 +62,7 @@ def test_crop_case_accepts_valid_png_and_saves_it(tmp_path, monkeypatch):
     assert response.status_code == 200
     payload = response.json()
     assert payload["status"] == "pending_expert_review"
-    assert payload["diagnosis_enabled"] if "diagnosis_enabled" in payload else True
+    assert payload["diagnosis_enabled"] is False
     saved_files = list(tmp_path.iterdir())
     assert len(saved_files) == 1
     assert saved_files[0].suffix == ".png"
