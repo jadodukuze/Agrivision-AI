@@ -4,7 +4,7 @@ import uuid
 from io import BytesIO
 
 os.environ.setdefault("DATABASE_URL", "sqlite:///./agrivision_test.db")
-os.environ.setdefault("JWT_SECRET_KEY", "test-only-secret-key-for-ci")
+os.environ.setdefault("JWT_SECRET_KEY", "test-only-secret-key-for-ci-which-is-long-enough-32-bytes")
 
 from fastapi.testclient import TestClient
 from PIL import Image
