@@ -29,7 +29,9 @@ app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True
 
 @app.on_event("startup")
 def create_tables():
-    Base.metadata.create_all(bind=engine)
+    # In production, apply versioned Alembic migrations before starting the API.
+    if os.getenv("APP_ENV", "development").lower() == "development":
+        Base.metadata.create_all(bind=engine)
 
 class RegisterInput(BaseModel):
     full_name: str = Field(min_length=2, max_length=120)
