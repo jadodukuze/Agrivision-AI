@@ -22,6 +22,7 @@ const imagePreview = $("imagePreview");
 const formStatus = $("formStatus");
 const caseHistory = $("caseHistory");
 const expertCases = $("expertCases");
+let expertImageUrls = [];
 
 if (yearElement) yearElement.textContent = new Date().getFullYear();
 
@@ -230,7 +231,19 @@ async function loadFarmerCases() {
   }
 }
 
+async function loadProtectedImage(caseId) {
+  const response = await fetch(API_BASE + "/api/v1/expert/cases/" + caseId + "/image", {
+    headers: { Authorization: "Bearer " + token() },
+  });
+  if (!response.ok) throw new Error("Image unavailable");
+  const objectUrl = URL.createObjectURL(await response.blob());
+  expertImageUrls.push(objectUrl);
+  return objectUrl;
+}
+
 async function loadExpertCases() {
+  for (const url of expertImageUrls) URL.revokeObjectURL(url);
+  expertImageUrls = [];
   if (!expertCases || !token()) return;
   expertCases.replaceChildren(makeTextElement("p", "Loading cases…", "muted"));
   try {
@@ -250,6 +263,15 @@ async function loadExpertCases() {
         makeTextElement("p", `Concern: ${item.description || "Not provided"}`),
         makeTextElement("p", `Status: ${item.status.replaceAll("_", " ")}`)
       );
+      try {
+        const image = document.createElement("img");
+        image.className = "case-image";
+        image.alt = "Uploaded crop photo for case " + item.id;
+        image.src = await loadProtectedImage(item.id);
+        card.append(image);
+      } catch {
+        card.append(makeTextElement("p", "The uploaded image is not currently available.", "muted"));
+      }
       if (item.status !== "reviewed") {
         const form = document.createElement("form");
         form.className = "review-form";
