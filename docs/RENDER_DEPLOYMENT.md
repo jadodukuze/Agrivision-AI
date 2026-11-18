@@ -24,7 +24,20 @@ This Blueprint uses free resources for staging. Render free web services have no
 The current upload implementation writes images to the local filesystem. In this Blueprint the upload directory is temporary. A restart or redeploy can remove uploaded images. Before production, implement private object storage (or an appropriately secured paid persistent disk), configure backups, and use a database plan with durable retention.
 
 ## First administrator
-Public registration creates farmer accounts only. An administrator must create expert accounts. The repository contains `backend/create_admin.py`, but the first administrator must be bootstrapped securely against the deployed database. Do not add administrator credentials to GitHub or expose a public admin-creation endpoint. Use an approved one-off command/shell workflow available on the selected Render plan before testing expert/admin workflows.
+Public registration creates farmer accounts only. The API provides a one-time, secret-protected bootstrap endpoint for the first administrator.
+
+1. Register your intended administrator account through the website first.
+2. In the Render Dashboard, open the `agrivision-ai-api` service and go to **Environment**.
+3. Add `ADMIN_BOOTSTRAP_EMAIL` with the exact email address of that registered account.
+4. Add `ADMIN_BOOTSTRAP_TOKEN` with a randomly generated secret of at least 32 characters. Generate one locally with Python: `python -c "import secrets; print(secrets.token_urlsafe(48))"`. Do not put this value in GitHub, source code, chat, or screenshots.
+5. Save the environment changes and wait for Render to redeploy.
+6. Open `/docs`, find `POST /api/v1/admin/bootstrap`, click **Try it out**, and submit the registered email plus the secret in `setup_token`.
+7. Confirm the response reports role `admin`.
+8. Immediately return to Render **Environment**, delete `ADMIN_BOOTSTRAP_TOKEN`, save, and wait for redeployment. The endpoint then disables itself. Keep `ADMIN_BOOTSTRAP_EMAIL` or remove it too; it is not a credential.
+
+The endpoint only promotes the one configured, already-registered account; it refuses incorrect secrets, a different email, missing accounts, and any attempt after an administrator exists. It does not accept passwords or create public administrator accounts. Sign out of the website and sign in again so the browser receives a fresh token containing the administrator role.
+
+Never share the bootstrap token, passwords, or access tokens. If the token is exposed before use, replace it in Render before continuing.
 
 ## Production checklist
 - Choose a database with durable storage, backups, and a retention policy.
