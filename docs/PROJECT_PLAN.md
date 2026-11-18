@@ -1,37 +1,42 @@
 # AgriVision AI — Development Plan
 
-## Phase 1: Foundation
-- [x] Create project documentation.
-- [x] Add initial frontend landing page.
-- [x] Add FastAPI application and health endpoint.
-- [ ] Verify the starter application locally.
+## Phase 1: Working platform foundation
+- [x] Create project documentation and initial MySQL schema.
+- [x] Add responsive website and crop photo submission.
+- [x] Add FastAPI health endpoint and API documentation.
+- [x] Add farmer registration, login, password hashing, and JWT authentication.
+- [x] Add database models and SQLite/MySQL connection configuration.
+- [x] Add farmer case submission and personal case history.
+- [x] Add expert queue, protected photo retrieval, and review workflow.
+- [x] Add administrator summary and staff account creation.
+- [x] Add a secure first-administrator bootstrap script.
+- [x] Add automated API tests and CI for Python 3.11 and 3.12.
 
-## Phase 2: Data and API
-- [ ] Design MySQL tables for users, crops, submissions, and expert reviews.
-- [ ] Add configuration through environment variables.
-- [ ] Add secure user authentication and role-based access.
-- [ ] Add crop image upload validation and safe file handling.
+## Phase 2: Production readiness
+- [ ] Add versioned database migrations.
+- [ ] Replace local uploads with private persistent object storage.
+- [ ] Add rate limiting, email verification, account recovery, and audit logs.
+- [ ] Add privacy retention/deletion controls, backups, and monitoring.
+- [ ] Deploy with HTTPS and production CORS configuration.
+- [ ] Complete accessibility and mobile testing.
 
-## Phase 3: AI and expert review
-- [ ] Select a suitable, licensed crop image dataset.
-- [ ] Train and evaluate a crop image classification model.
-- [ ] Report model limitations and confidence carefully.
-- [ ] Add expert review and correction workflow.
+## Phase 3: Farmer and expert experience
+- [x] Farmer account, submission, and case history screens.
+- [x] Expert case queue and review screen.
+- [x] Administrator summary and staff account management screen.
+- [ ] Add case assignment, review status workflow, and review notifications.
+- [ ] Complete English and Kinyarwanda translations.
 
-## Phase 4: User experience
-- [ ] Farmer dashboard and submission history.
-- [ ] Expert dashboard and case review.
-- [ ] Administrator dashboard.
-- [ ] English and Kinyarwanda interface support.
-
-## Phase 5: Quality and release
-- [ ] Add automated tests.
-- [ ] Review privacy and security.
-- [ ] Test on mobile screens and slower connections.
-- [ ] Prepare deployment and user documentation.
+## Phase 4: AI and agricultural validation
+- [ ] Select a suitable, licensed, representative crop image dataset.
+- [ ] Build reproducible training and evaluation pipelines.
+- [ ] Evaluate per-class precision, recall, F1, confusion matrix, and calibration on held-out data.
+- [ ] Add model versioning, confidence thresholds, and expert correction workflow.
+- [ ] Enable preliminary predictions only after agricultural expert validation.
 
 ## Responsible-use requirements
 - Never present an unverified model output as a confirmed diagnosis.
-- Do not prescribe pesticide products or application rates automatically.
-- Make expert review available for uncertain or high-impact cases.
+- Do not automatically prescribe pesticide products or application rates.
+- Keep expert review available for uncertain or high-impact cases.
 - Protect farmer accounts, photos, and personal information.
+- Do not claim model accuracy until measured on a held-out test set.

@@ -4,5 +4,9 @@ python-multipart
 pydantic
 python-dotenv
 Pillow
+SQLAlchemy>=2.0,<3.0
+PyMySQL
+PyJWT
+pwdlib[argon2]
 pytest
 httpx

@@ -1,1 +1,153 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="AgriVision AI crop photo submission and expert review."><title>AgriVision AI | Crop Health Support</title><link rel="stylesheet" href="css/style.css"></head><body><header class="site-header"><a class="brand" href="#home">🌱 AgriVision AI</a><nav><a href="#how-it-works">How it works</a><a href="#submit-case">Submit a case</a><a href="#about">About</a></nav></header><main id="home"><section class="hero"><div class="hero-content"><p class="eyebrow">Technology supporting agriculture</p><h1>Understand crop problems. Get support sooner.</h1><p class="hero-text">Share crop photos, record crop-health concerns, and connect with agricultural experts.</p><a class="primary-button" href="#submit-case">Submit crop photo</a><p class="notice">Development preview: AI disease diagnosis is not enabled yet. Consult an agricultural expert before making treatment decisions.</p></div><div class="hero-art" role="img" aria-label="Green plant">🌿</div></section><section class="section" id="how-it-works"><p class="eyebrow">Simple process</p><h2>How it will work</h2><div class="steps"><article class="step-card"><span>01</span><h3>Share a photo</h3><p>Submit a clear photo of a crop leaf and describe the concern.</p></article><article class="step-card"><span>02</span><h3>Assessment</h3><p>A future AI model will provide preliminary information after evaluation.</p></article><article class="step-card"><span>03</span><h3>Expert guidance</h3><p>An agricultural expert reviews the case and provides verified guidance.</p></article></div></section><section class="workspace" id="submit-case"><div class="workspace-inner"><p class="eyebrow">Farmer service</p><h2>Submit a crop-health case</h2><p class="muted">The photo is stored for future review. Do not include private information in the image.</p><form id="caseForm" data-api="http://127.0.0.1:8000/api/v1/cases" class="panel"><div class="form-row"><div class="field"><label for="farmerName">Farmer name</label><input id="farmerName" name="farmer_name" required minlength="2" maxlength="100"></div><div class="field"><label for="cropName">Crop</label><select id="cropName" name="crop_name" required><option value="">Choose crop</option><option>Maize</option><option>Beans</option><option>Irish potato</option><option>Tomato</option><option>Cassava</option><option>Banana</option><option>Other</option></select></div></div><div class="form-row"><div class="field"><label for="location">District / location (optional)</label><input id="location" name="location" maxlength="120" placeholder="e.g. Gasabo"></div><div class="field"><label for="cropImage">Crop photo (JPG, PNG, WebP; max 5 MB)</label><input id="cropImage" name="image" type="file" accept="image/jpeg,image/png,image/webp" required><img id="imagePreview" class="preview" alt="Selected crop photo preview"></div></div><div class="field"><label for="description">Describe the concern (optional)</label><textarea id="description" name="description" rows="3" maxlength="1000"></textarea></div><p><button class="submit-button" type="submit">Submit crop case</button></p><p id="formStatus" class="status" role="status" aria-live="polite"></p></form></div></section><section class="section" id="about"><h2>Built to support farmers</h2><p class="muted">Our goal is to make useful agricultural information easier to access while keeping expert review and responsible recommendations central.</p></section></main><footer>© <span id="year"></span> AgriVision AI · Project in development</footer><script src="js/main.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AgriVision AI crop-health case submission and expert review.">
+  <title>AgriVision AI | Crop Health Support</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#home">🌱 AgriVision AI</a>
+    <nav aria-label="Main navigation">
+      <a href="#how-it-works">How it works</a>
+      <a href="#account">Account</a>
+      <a href="#workspace">Workspace</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <main id="home">
+    <section class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">Technology supporting agriculture</p>
+        <h1>Understand crop problems. Get support sooner.</h1>
+        <p class="hero-text">Share crop photos, record crop-health concerns, and connect with agricultural experts.</p>
+        <a class="primary-button" href="#account">Create a farmer account</a>
+        <p class="notice">Development preview: AI disease diagnosis is not enabled. An agricultural expert should review crop concerns before treatment decisions.</p>
+      </div>
+      <div class="hero-art" role="img" aria-label="Green plant">🌿</div>
+    </section>
+
+    <section class="section" id="how-it-works">
+      <p class="eyebrow">Simple process</p>
+      <h2>How it works</h2>
+      <div class="steps">
+        <article class="step-card"><span>01</span><h3>Create an account</h3><p>Register as a farmer and sign in securely.</p></article>
+        <article class="step-card"><span>02</span><h3>Share a photo</h3><p>Submit a clear crop photo and describe the concern.</p></article>
+        <article class="step-card"><span>03</span><h3>Expert assessment</h3><p>An agricultural expert can review the case and record guidance.</p></article>
+      </div>
+    </section>
+
+    <section class="workspace" id="account">
+      <div class="workspace-inner">
+        <p class="eyebrow">Account access</p>
+        <h2>Register or sign in</h2>
+        <p class="muted">Farmer accounts can be created here. Expert and administrator accounts are created by an administrator.</p>
+        <div class="auth-grid" id="authForms">
+          <form id="registerForm" class="panel">
+            <h3>Create farmer account</h3>
+            <div class="field"><label for="registerName">Full name</label><input id="registerName" name="full_name" required minlength="2" maxlength="120" autocomplete="name"></div>
+            <div class="field"><label for="registerEmail">Email</label><input id="registerEmail" name="email" type="email" required maxlength="190" autocomplete="email"></div>
+            <div class="field"><label for="registerPassword">Password (at least 10 characters)</label><input id="registerPassword" name="password" type="password" required minlength="10" maxlength="128" autocomplete="new-password"></div>
+            <div class="field"><label for="registerLanguage">Preferred language</label><select id="registerLanguage" name="preferred_language"><option value="en">English</option><option value="rw">Kinyarwanda</option></select></div>
+            <button class="submit-button" type="submit">Create account</button>
+          </form>
+          <form id="loginForm" class="panel">
+            <h3>Sign in</h3>
+            <div class="field"><label for="loginEmail">Email</label><input id="loginEmail" name="email" type="email" required maxlength="190" autocomplete="email"></div>
+            <div class="field"><label for="loginPassword">Password</label><input id="loginPassword" name="password" type="password" required autocomplete="current-password"></div>
+            <button class="submit-button" type="submit">Sign in</button>
+          </form>
+        </div>
+        <div id="signedInPanel" class="panel signed-in" hidden>
+          <p id="signedInText" class="signed-in-text"></p>
+          <button id="logoutButton" class="secondary-button" type="button">Sign out</button>
+        </div>
+        <p id="accountStatus" class="status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="workspace" id="workspace">
+      <div class="workspace-inner">
+        <div id="signInPrompt" class="panel">
+          <h2>Your AgriVision workspace</h2>
+          <p class="muted">Sign in to open the tools available to your account.</p>
+        </div>
+
+        <section id="farmerWorkspace" hidden>
+          <p class="eyebrow">Farmer service</p>
+          <h2>Submit a crop-health case</h2>
+          <p class="muted">Your image is submitted for expert review. The current version does not provide an AI diagnosis.</p>
+          <form id="caseForm" data-api-base="http://127.0.0.1:8000" class="panel">
+            <div class="form-row">
+              <div class="field">
+                <label for="cropName">Crop</label>
+                <select id="cropName" name="crop_name" required>
+                  <option value="">Choose crop</option>
+                  <option>Maize</option><option>Beans</option><option>Irish potato</option>
+                  <option>Tomato</option><option>Cassava</option><option>Banana</option><option>Other</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="location">District / location (optional)</label>
+                <input id="location" name="location" maxlength="120" placeholder="e.g. Gasabo">
+              </div>
+            </div>
+            <div class="field">
+              <label for="cropImage">Crop photo (JPG, PNG, WebP; max 5 MB)</label>
+              <input id="cropImage" name="image" type="file" accept="image/jpeg,image/png,image/webp" required>
+              <img id="imagePreview" class="preview" alt="Selected crop photo preview" hidden>
+            </div>
+            <div class="field">
+              <label for="description">Describe the concern (optional)</label>
+              <textarea id="description" name="description" rows="3" maxlength="1000"></textarea>
+            </div>
+            <button class="submit-button" type="submit">Submit crop case</button>
+            <p id="formStatus" class="status" role="status" aria-live="polite"></p>
+          </form>
+          <div class="history-panel">
+            <div class="history-heading"><h3>My submitted cases</h3><button id="refreshHistory" class="secondary-button" type="button">Refresh</button></div>
+            <div id="caseHistory" class="case-history" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section id="expertWorkspace" hidden>
+          <p class="eyebrow">Expert workspace</p>
+          <h2>Cases waiting for assessment</h2>
+          <div class="history-heading"><p class="muted">Review submitted case information and record your assessment.</p><button id="refreshExpertCases" class="secondary-button" type="button">Refresh cases</button></div>
+          <div id="expertCases" class="case-history" aria-live="polite"></div>
+        </section>
+
+        <section id="adminWorkspace" hidden>
+          <p class="eyebrow">Administrator workspace</p>
+          <h2>Platform overview</h2>
+          <div id="adminSummary" class="summary-grid"></div>
+          <form id="staffForm" class="panel staff-form">
+            <h3>Create expert or administrator account</h3>
+            <div class="form-row">
+              <div class="field"><label for="staffName">Full name</label><input id="staffName" name="full_name" required minlength="2" maxlength="120"></div>
+              <div class="field"><label for="staffEmail">Email</label><input id="staffEmail" name="email" type="email" required maxlength="190"></div>
+            </div>
+            <div class="form-row">
+              <div class="field"><label for="staffPassword">Temporary password (at least 10 characters)</label><input id="staffPassword" name="password" type="password" required minlength="10" maxlength="128"></div>
+              <div class="field"><label for="staffRole">Role</label><select id="staffRole" name="role"><option value="expert">Agricultural expert</option><option value="admin">Administrator</option></select></div>
+            </div>
+            <button class="submit-button" type="submit">Create staff account</button>
+            <p id="staffStatus" class="status" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <h2>Built to support farmers</h2>
+      <p class="muted">Our goal is to make useful agricultural information easier to access while keeping expert review and responsible recommendations central.</p>
+    </section>
+  </main>
+
+  <footer>© <span id="year"></span> AgriVision AI · Development prototype</footer>
+  <script src="js/main.js"></script>
+</body>
+</html>
