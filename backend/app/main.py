@@ -200,7 +200,7 @@ def my_cases(user: User = Depends(require_roles("farmer", "admin")), db: Session
 @app.get("/api/v1/expert/cases", tags=["Expert review"])
 def expert_case_queue(user: User = Depends(require_roles("expert", "admin")), db: Session = Depends(get_db)):
     cases = db.scalars(select(CropCase).order_by(CropCase.created_at.asc())).all()
-    return [{"id": c.id, "farmer_id": c.farmer_id, "crop_name": c.crop_name, "location": c.location, "description": c.description, "status": c.status, "created_at": c.created_at} for c in cases]
+    return [{"id": c.id, "farmer_id": c.farmer_id, "farmer_name": c.farmer.full_name, "crop_name": c.crop_name, "location": c.location, "description": c.description, "status": c.status, "created_at": c.created_at, "has_image": bool(c.image_path)} for c in cases]
 
 
 @app.post("/api/v1/expert/cases/{case_id}/review", status_code=201, tags=["Expert review"])
