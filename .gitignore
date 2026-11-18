@@ -26,3 +26,10 @@ backend/storage/uploads/*
 !backend/storage/uploads/.gitkeep
 backend/storage/processed/*
 !backend/storage/processed/.gitkeep
+
+# Local databases and test artifacts
+*.db
+*.sqlite
+*.sqlite3
+.coverage
+htmlcov/
