@@ -15,7 +15,7 @@ AgriVision AI helps farmers submit crop photos, track crop-health cases, and rec
 - Image content verification, 5 MB limit, and image-dimension checks.
 - Authenticated expert queue, protected crop-photo access, and expert reviews.
 - Administrator summary and privileged staff-account creation.
-- First administrator bootstrap script.
+- One-time, secret-protected first-administrator bootstrap endpoint for deployed environments; local bootstrap script for development.
 - GitHub Actions tests on Python 3.11 and 3.12.
 
 ## Roles
@@ -36,6 +36,10 @@ AgriVision AI helps farmers submit crop photos, track crop-health cases, and rec
 ## Deploy to Render
 
 A Render Blueprint is provided in `render.yaml` for a staging deployment. Follow [`docs/RENDER_DEPLOYMENT.md`](docs/RENDER_DEPLOYMENT.md) to connect GitHub and deploy. The free configuration is for testing only: its database expires after 30 days, the web service has no persistent disk, and uploaded photos are temporary. Do not use it for real farmer data. Durable database backups and private persistent image storage are required before production.
+
+## First administrator on Render
+
+Public registration creates farmer accounts only. To promote your already-registered account to the first administrator, follow the secure one-time procedure in [`docs/RENDER_DEPLOYMENT.md`](docs/RENDER_DEPLOYMENT.md#first-administrator). Remove the bootstrap token from Render immediately after successful setup.
 
 ## Local setup
 
