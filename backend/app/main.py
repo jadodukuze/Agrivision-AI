@@ -1,5 +1,6 @@
 """AgriVision AI API: authenticated crop cases and expert review."""
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 from uuid import uuid4
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
@@ -22,11 +23,6 @@ MAX_BYTES = 5 * 1024 * 1024
 ALLOWED_FORMATS = {"JPEG": ".jpg", "PNG": ".png", "WEBP": ".webp"}
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
-app = FastAPI(
-    title="AgriVision AI",
-    description="Crop-health case submission and agricultural expert review. AI diagnosis is not enabled.",
-    version="1.0.0",
-)
 
 origins = [value.strip() for value in os.getenv("CORS_ORIGINS", "http://127.0.0.1:5500,http://localhost:5500").split(",") if value.strip()]
 app.add_middleware(
@@ -38,7 +34,6 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
 def initialize_database():
     Base.metadata.create_all(bind=engine)
     # Optional first administrator. Set both values as deployment secrets.
